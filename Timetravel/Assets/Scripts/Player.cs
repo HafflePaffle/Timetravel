@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-   Vector2 movement = Vector2.zero;
-   public float speed;
    [SerializeField] private Timer TimeController;
    [SerializeField] private DialogueUI dialogueUI;
     public List<float> positionx;
@@ -23,9 +21,12 @@ public class Player : MonoBehaviour
 
     public DialogueUI DialogueUI => dialogueUI;
     public Rigidbody2D rb;
-    
 
- 
+    private float inputHorizontal;
+    private float inputVertical;
+    public float moveSpeed = 5f;
+    public float speedLimiter = 0.7f;
+
 
     void Start()
     {
@@ -44,26 +45,10 @@ public class Player : MonoBehaviour
  
     void Update()
     {
-
-        if (Input.GetKey(KeyCode.A) && TimeController.updateTimer == true)
-        {
-            
-            transform.position += transform.right * -speed * Time.deltaTime;
-        }
-
-
-        if (Input.GetKey(KeyCode.D) && TimeController.updateTimer == true)
-        {
-            
-            transform.position += transform.right * speed * Time.deltaTime;
-        }
-
-
         if (TimeController.Rewinding == true)
-      {
+        {
           Rewind();
-      }
-
+        }
 
       if(Input.GetKeyDown(KeyCode.F) && TimeController.updateTimer == true)
       {
@@ -73,14 +58,22 @@ public class Player : MonoBehaviour
         }
       }
 
+
         if (TimeController.updateTimer == false)
         {
-            rb.gravityScale = 0.0f;
-            rb.velocity = vector2;
+
+            rb.velocity = Vector2.zero;
+        }
+
+        if(TimeController.updateTimer == true)
+        {
+            inputHorizontal = Input.GetAxisRaw("Horizontal");
+            inputVertical = Input.GetAxisRaw("Vertical");
         }
         else
         {
-            rb.gravityScale = 1f;
+            inputHorizontal = 0;
+            inputVertical = 0;
         }
 
 
@@ -89,16 +82,25 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-
-
       if(TimeController.updateTimer == true)
       {
         Record();
       }
 
+        if (inputHorizontal != 0 || inputVertical != 0)
+        {
+            if (inputHorizontal != 0 && inputVertical != 0)
+            {
+                inputHorizontal *= speedLimiter;
+                inputVertical *= speedLimiter;
+            }
 
-
-
+            rb.velocity = new Vector2(inputHorizontal * moveSpeed, inputVertical * moveSpeed);
+        }
+        else
+        {
+            rb.velocity = Vector2.zero;
+        }
     }
 
     void Record()

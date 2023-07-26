@@ -5,34 +5,29 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private Canvas UI;
-    [SerializeField] DialogueUI dialogueUI;
-    [SerializeField] private ClueJournalManager journal;
-
 
     void Start()
     {
         UI.gameObject.SetActive(true);
     }
 
- 
-    void Update()
+    void OnEnable()
     {
-        if(dialogueUI.IsOpen == true)
+        if(UI.gameObject.activeSelf)
         {
             UI.gameObject.SetActive(false);
         }
-        else
+
+    }
+
+    void OnDisable()
+    {
+        if (!UI.gameObject.activeSelf)
         {
             UI.gameObject.SetActive(true);
         }
 
-        if (journal.journalActive == true)
-        {
-            UI.gameObject.SetActive(false);
-        }
-        else
-        {
-            UI.gameObject.SetActive(true);
-        }
     }
+
+    
 }
